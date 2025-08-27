@@ -6,31 +6,33 @@ import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { Task } from './task.entity';
 import { TasksRepository } from './tasks.repository';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TasksService {
     constructor(
-        @InjectRepository(TasksRepository)
         private tasksRepository: TasksRepository
     ) {}
 
     async getTaskById(id: string): Promise<Task> {
-        const found = await this.tasksRepository.findOne({
-            where: {
-                id
-            }
-        });
-
-        if (!found) {
-            throw new NotFoundException(`Task with ID '${id}' not found`);
-        }
-
-        return found;
+        return await this.tasksRepository.findOne(id);;
     }
 
-    // getAllTasks(): Task[] {
-    //     return this.tasks;
-    // }
+    async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+        return this.tasksRepository.createTask(createTaskDto)
+    }
+
+    async deleteTask(id: string): Promise<void> {
+        return this.tasksRepository.deleteTask(id);
+    }
+
+    async updateTaskStatus(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
+        return this.tasksRepository.updateTask(id, updateTaskDto);
+    }
+
+    async getTasks(getTasksFilterDto: GetTasksFilterDto): Promise<Task[]> {
+        return this.tasksRepository.getTasks(getTasksFilterDto)
+    }
 
     // getTasksWithFilters(getTasksFilterDto: GetTasksFilterDto): Task[] {
     //     const { status, search } = getTasksFilterDto;
@@ -66,20 +68,6 @@ export class TasksService {
     //     return task;
     // }
 
-    // deleteTask(id: string): void {
-    //     const taskToDelete = this.getTaskById(id);
-    //     this.tasks = this.tasks.filter(task => task.id !== taskToDelete.id)
-    // }
+    
 
-    // updateTaskStatus(id: string, updateTaskDto: UpdateTaskDto): Task {
-    //     let task = this.getTaskById(id)
-    //     const indexOfTask = this.tasks.indexOf(task);
-    //     const {status} = updateTaskDto;
-    //     task = {
-    //         ...task,
-    //         status: status ? status : task.status,
-    //     };
-    //     this.tasks[indexOfTask] = task;
-    //     return task;
-    // }
 }
